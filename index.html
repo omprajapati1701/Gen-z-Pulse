@@ -39,6 +39,11 @@
         /* UTILITIES */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .hidden { display: none !important; }
+        .legal-page { padding: 40px 0; max-width: 800px; margin: 0 auto; }
+        .legal-page h2 { color: var(--accent-green); margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .legal-page h3 { color: var(--accent-purple); margin-top: 20px; margin-bottom: 10px; }
+        .legal-page p { margin-bottom: 15px; color: #ccc; }
+        .legal-page ul { margin-left: 20px; margin-bottom: 15px; color: #ccc; }
 
         /* BUTTONS */
         .btn { background: transparent; border: 1px solid var(--accent-green); color: var(--accent-green); padding: 10px 20px; font-family: var(--font-mono); font-weight: bold; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; font-size: 0.9rem; }
@@ -105,7 +110,8 @@
         /* FOOTER */
         .newsletter { text-align: center; padding: 50px 0; background: linear-gradient(to top, #111, var(--bg-color)); margin-top: 50px; }
         footer { border-top: 1px solid #222; padding: 40px 0; text-align: center; font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
-        .seo-text { font-size: 0.9rem; color: #666; max-width: 800px; margin: 0 auto 40px auto; text-align: center; line-height: 1.8; }
+        .footer-links span { margin: 0 10px; cursor: pointer; color: #888; transition: 0.3s; }
+        .footer-links span:hover { color: var(--accent-green); text-decoration: underline; }
 
         /* MOBILE FIXES */
         @media (max-width: 768px) { 
@@ -199,6 +205,38 @@
         </section>
     </div>
 
+    <div id="about-view" class="container hidden legal-page">
+        <h2>About Gen-Z Pulse</h2>
+        <p>Welcome to <strong>Gen-Z Pulse</strong>, your number one source for all things aesthetic, tech, and student life hacks. We're dedicated to giving you the very best of internet culture, with a focus on budget-friendly gadgets, mental health awareness, and the latest trends.</p>
+        <p>Founded in 2026 by <strong>Om Prajapati</strong>, Gen-Z Pulse has come a long way from its beginnings. When we first started out, our passion for "No Cap, Just Vibes" drove us to create this community.</p>
+        <p>We hope you enjoy our blogs as much as we enjoy offering them to you. If you have any questions or comments, please don't hesitate to contact us.</p>
+        <p><strong>Contact Email:</strong> omprajapati1701@gmail.com</p>
+        <button class="btn" onclick="goHome()" style="margin-top: 20px;">&larr; Back to Home</button>
+    </div>
+
+    <div id="privacy-view" class="container hidden legal-page">
+        <h2>Privacy Policy</h2>
+        <p>At Gen-Z Pulse, accessible from https://omprajapati1701.github.io, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Gen-Z Pulse and how we use it.</p>
+        <h3>Cookies and Web Beacons</h3>
+        <p>Like any other website, Gen-Z Pulse uses 'cookies'. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited.</p>
+        <h3>Google DoubleClick DART Cookie</h3>
+        <p>Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to our site and other sites on the internet.</p>
+        <h3>Log Files</h3>
+        <p>Gen-Z Pulse follows a standard procedure of using log files. These files log visitors when they visit websites. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks.</p>
+        <button class="btn" onclick="goHome()" style="margin-top: 20px;">&larr; Back to Home</button>
+    </div>
+
+    <div id="terms-view" class="container hidden legal-page">
+        <h2>Terms & Conditions</h2>
+        <p>Welcome to Gen-Z Pulse! These terms and conditions outline the rules and regulations for the use of Gen-Z Pulse's Website.</p>
+        <h3>1. Content</h3>
+        <p>All content provided on this blog is for informational purposes only. The owner of this blog makes no representations as to the accuracy or completeness of any information on this site or found by following any link on this site.</p>
+        <h3>2. Affiliate Disclaimer</h3>
+        <p>Gen-Z Pulse participates in the Amazon Services LLC Associates Program. As an Amazon Associate, we earn from qualifying purchases. This means if you click on an Amazon link and buy something, we may earn a small commission at no extra cost to you.</p>
+        <button class="btn" onclick="goHome()" style="margin-top: 20px;">&larr; Back to Home</button>
+    </div>
+
+
     <div id="read-view" class="container blog-section hidden" style="padding-top: 40px;">
         <button class="btn" onclick="goHome()" style="margin-bottom: 20px;">&larr; Back to Home</button>
         <div id="full-post-content" style="background: #111; padding: 40px; border: 1px solid var(--accent-green); min-height: 50vh;"></div>
@@ -230,6 +268,18 @@
             </a>
         </div>
     </section>
+
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 15px;">&copy; 2026 Gen-Z Pulse by Om Prajapati.</p>
+            <div class="footer-links">
+                <span onclick="goHome()">Home</span>
+                <span onclick="showSection('about')">About Us</span>
+                <span onclick="showSection('privacy')">Privacy Policy</span>
+                <span onclick="showSection('terms')">Terms & Conditions</span>
+            </div>
+        </div>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -510,11 +560,12 @@
                 document.getElementById('post-title').value = "";
                 document.getElementById('post-content').value = "";
             }
-            ['home', 'read', 'auth', 'admin'].forEach(sid => {
+            ['home', 'read', 'auth', 'admin', 'about', 'privacy', 'terms'].forEach(sid => {
                 const el = document.getElementById(sid + '-view');
                 if(el) el.classList.add('hidden');
             });
-            document.getElementById(id + '-view').classList.remove('hidden');
+            const activeEl = document.getElementById(id + '-view');
+            if(activeEl) activeEl.classList.remove('hidden');
         };
         window.goHome = () => showSection('home');
 
