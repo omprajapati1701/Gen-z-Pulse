@@ -298,9 +298,6 @@
             }
         };
 
-        // Initial Load
-        loadBlogs('All');
-
         // --- AUTH STATE UI ---
         onAuthStateChanged(auth, (user) => {
             const loginBtn = document.getElementById('nav-login');
@@ -314,6 +311,8 @@
                 document.getElementById('auth-view').classList.add('hidden'); // Hide login form if visible
                 
                 if(user.email === ADMIN_EMAIL) adminBtn.classList.remove('hidden');
+                
+                // ❌ maine yahan se loadBlogs hata diya hai (Problem Fixed)
             } else {
                 // User Logged Out
                 loginBtn.classList.remove('hidden');
@@ -451,6 +450,9 @@
         if(h<12) g.innerText="Rise and Grind ☀️";
         else if(h<18) g.innerText="It's Giving Afternoon ☕";
         else g.innerText="Go to Sleep Bestie 💤";
+
+        // Initial Load (Sirf ek baar chalega)
+        loadBlogs('All');
     </script>
 </body>
 </html>
