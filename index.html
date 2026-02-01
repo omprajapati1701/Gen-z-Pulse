@@ -233,7 +233,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp, doc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit, serverTimestamp, doc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         // 🔥 FIREBASE CONFIG
@@ -256,7 +256,7 @@
         let isLoginMode = true;
         let editingPostId = null;
 
-        // 🟢 LOAD BLOGS FUNCTION
+        // 🟢 LOAD BLOGS FUNCTION (OPTIMIZED)
         window.loadBlogs = async (filterCategory = 'All') => {
             const grid = document.getElementById('blog-grid');
             if(!grid) return;
@@ -264,7 +264,8 @@
             showSection('home');
             
             try {
-                const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+                // ADDED LIMIT 20 for Speed
+                const q = query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(20));
                 const querySnapshot = await getDocs(q);
                 grid.innerHTML = ""; 
                 
@@ -272,6 +273,9 @@
                     grid.innerHTML = "<p>No vibes yet. Stay tuned.</p>";
                     return;
                 }
+
+                // USE FRAGMENT FOR SPEED
+                const fragment = document.createDocumentFragment();
 
                 querySnapshot.forEach((docSnapshot) => {
                     const post = docSnapshot.data();
@@ -284,7 +288,7 @@
                     const card = document.createElement('article');
                     card.className = 'card';
                     
-                    // SAFETY FIX: If title is missing, use empty string to avoid crash
+                    // SAFETY FIX for Search Crash
                     const titleSafe = post.title ? post.title.toLowerCase() : "";
                     card.setAttribute('data-title', titleSafe);
 
@@ -322,8 +326,11 @@
                         `;
                     }
                     card.innerHTML = htmlContent;
-                    grid.appendChild(card);
+                    fragment.appendChild(card);
                 });
+
+                grid.appendChild(fragment); // Single Update
+
             } catch (e) { 
                 console.error(e);
                 grid.innerHTML = "<p>Error loading content. (Check Console)</p>"; 
@@ -368,7 +375,7 @@
             }
         };
 
-        // 🟢 OPEN POST & INCREMENT VIEW COUNT
+        // 🟢 OPEN POST
         window.openPost = async (pid, post) => {
             showSection('read');
             document.getElementById('full-post-content').innerHTML = `<h1>${post.title}</h1><hr><div style="font-size:1.1rem; line-height:1.8;">${post.content.replace(/\n/g, "<br>")}</div>`;
@@ -376,7 +383,7 @@
             try {
                 const postRef = doc(db, "posts", pid);
                 await updateDoc(postRef, { views: increment(1) });
-            } catch(e) { console.log("View update failed (Auth Required for writes)", e); }
+            } catch(e) { console.log("View update failed", e); }
         };
 
         // --- AUTH & SYSTEM LOGIC ---
