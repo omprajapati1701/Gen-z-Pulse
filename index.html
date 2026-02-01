@@ -7,20 +7,15 @@
     <title>Gen-Z Pulse | Best Aesthetic, Tech & Valentine Gifts India 2026</title>
     
     <meta name="description" content="Gen-Z Pulse is India's ultimate aesthetic community. Find the best Valentine's Day gifts, viral Amazon gadgets, mental health tips, and side quests. No cap, just vibes.">
-    
-    <meta name="keywords" content="Valentine Gifts India 2026, Best Amazon Finds Under 500, Aesthetic Desk Setup, Gen-Z Blog India, Instax Camera Price, Tech Gadgets for Students, Mental Health Vibes">
-    
+    <meta name="keywords" content="Valentine Gifts India 2026, Best Amazon Finds Under 500, Aesthetic Desk Setup, Gen-Z Blog India, Instax Camera Price, Tech Gadgets for Students">
     <meta name="author" content="Om Prajapati">
-    <meta name="robots" content="index, follow"> <meta property="og:title" content="Gen-Z Pulse | No Cap. Just Vibes. ✨">
-    <meta property="og:description" content="Viral aesthetic finds and tech reviews for Gen-Z. Check it out now!">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3062/3062634.png">
-    <meta property="og:url" content="https://omprajapati1701.github.io/Gen-z-Pulse/">
-    <meta property="og:type" content="website">
     
-    <meta name="google-site-verification" content="PASTE_YOUR_GOOGLE_CODE_HERE" />
-
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2868302084432283"
+     crossorigin="anonymous"></script>
     <style>
-        /* CSS Same as before */
+        /* =========================================
+           CSS STYLES (DESIGN)
+           ========================================= */
         :root { --bg-color: #050505; --text-color: #f0f0f0; --accent-green: #ccff00; --accent-purple: #bf00ff; --glass: rgba(255, 255, 255, 0.05); --font-main: 'Helvetica Neue', sans-serif; --font-mono: 'Courier New', monospace; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-main); overflow-x: hidden; line-height: 1.6; }
@@ -90,7 +85,7 @@
         </section>
 
         <div class="container seo-text">
-            <p>Welcome to <strong>Gen-Z Pulse</strong>, the ultimate blog for aesthetic vibes, mental health, and student life in India. We review the best <strong>tech gadgets for students</strong>, share viral <strong>Amazon finds under ₹500</strong>, and help you find the perfect <strong>Valentine's Day gifts</strong> like Instax cameras and cute plushies.</p>
+            <p>Welcome to <strong>Gen-Z Pulse</strong>. We review the best <strong>tech gadgets</strong>, share viral <strong>Amazon finds</strong>, and help you find the perfect <strong>Valentine's Day gifts</strong>.</p>
         </div>
 
         <div class="marquee">
@@ -151,7 +146,7 @@
         import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-        // 🔥 YOUR CONFIG 🔥
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDHsq28W0PgjmDWJB9f1SOVwdRUvWT43oE",
             authDomain: "gen-z-pulse.firebaseapp.com",
@@ -168,7 +163,7 @@
         const googleProvider = new GoogleAuthProvider();
         const ADMIN_EMAIL = "omprajapati1701@gmail.com"; 
 
-        // 🟢 LOAD BLOGS AUTOMATICALLY
+        // 🟢 LOAD BLOGS FUNCTION
         window.loadBlogs = async (filterCategory = 'All') => {
             const grid = document.getElementById('blog-grid');
             if(!grid) return;
@@ -200,7 +195,7 @@
                 });
             } catch (e) { 
                 console.error(e);
-                grid.innerHTML = "<p>Error loading content. Check Firebase Rules.</p>"; 
+                grid.innerHTML = "<p>Error loading content. (Check Firebase Rules or Internet)</p>"; 
             }
         };
 
