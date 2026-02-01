@@ -158,7 +158,17 @@
         .newsletter { text-align: center; padding: 50px 0; background: linear-gradient(to top, #111, var(--bg-color)); margin-top: 50px; }
         footer { border-top: 1px solid #222; padding: 40px 0; text-align: center; font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
 
-        @media (max-width: 768px) { .hero h1 { font-size: 3rem; } .nav-links { display: none; } }
+        /* MEDIA QUERIES (MOBILE FIXES) */
+        @media (max-width: 768px) { 
+            .hero h1 { font-size: 3rem; } 
+            .nav-links { display: none; } 
+            
+            /* FIX FOR CUTTING BUTTONS */
+            #full-post-content { padding: 15px !important; }
+            #full-post-content img, 
+            #full-post-content button, 
+            #full-post-content a { max-width: 100% !important; height: auto; }
+        }
     </style>
 </head>
 <body>
