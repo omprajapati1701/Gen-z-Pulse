@@ -396,7 +396,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit, serverTimestamp, doc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        // 🔥 Change 1: Added 'getDoc' to imports for direct link loading
+        import { getFirestore, collection, addDoc, getDocs, getDoc, orderBy, query, limit, serverTimestamp, doc, updateDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
         // 🔥 FIREBASE CONFIG
@@ -418,13 +419,77 @@
 
         let isLoginMode = true;
         let editingPostId = null;
+        window.cachedPosts = {}; // To store data temporarily
 
-        // 🟢 ATTACH FUNCTIONS TO WINDOW FOR BUTTONS TO WORK
+        // 🟢 ROUTING LOGIC (NEW) 🟢
+        window.handleRouting = async () => {
+            const hash = window.location.hash;
+            
+            // Case 1: Blog Open Request (#view=BLOG_ID)
+            if (hash.startsWith("#view=")) {
+                const pid = hash.substring(6); // Remove '#view='
+                window.showSection('read');
+                
+                let post = window.cachedPosts[pid];
+                
+                // If direct link (data not in cache), fetch from Firebase
+                if (!post) {
+                    document.getElementById('full-post-content').innerHTML = "<p style='text-align:center; margin-top:50px;'>Brewing Tea... ☕ (Loading)</p>";
+                    try {
+                        const docRef = doc(db, "posts", pid);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            post = docSnap.data();
+                            window.cachedPosts[pid] = post;
+                        } else {
+                            document.getElementById('full-post-content').innerHTML = "<p>404: Vibe Not Found (Deleted).</p>";
+                            return;
+                        }
+                    } catch (e) {
+                        document.getElementById('full-post-content').innerHTML = "<p>Error loading vibe. Check internet.</p>";
+                        return;
+                    }
+                }
+
+                // Render Post
+                document.getElementById('full-post-content').innerHTML = `
+                    <h1 style="color:var(--accent-green);">${post.title}</h1>
+                    <div style="font-size:0.8rem; color:#666; margin-bottom:20px;">Category: ${post.category}</div>
+                    <hr style="border-color:#333; margin-bottom:20px;">
+                    <div style="font-size:1.1rem; line-height:1.8;">${post.content.replace(/\n/g, "<br>")}</div>
+                `;
+                window.scrollTo(0,0);
+
+                // Update View Count
+                try {
+                    await updateDoc(doc(db, "posts", pid), { views: increment(1) });
+                } catch(e) {}
+
+            } 
+            // Case 2: Home Page (No Hash or Empty)
+            else {
+                window.showSection('home');
+                // Only load if grid is empty to save data
+                if(document.getElementById('blog-grid').innerHTML.includes('Loading')) {
+                    window.loadBlogs('All');
+                }
+            }
+        };
+
+        // Listen for URL changes (Back button support)
+        window.addEventListener("hashchange", window.handleRouting);
+
+        // 🟢 END ROUTING LOGIC 🟢
+
+
+        // 🟢 ATTACH FUNCTIONS TO WINDOW
         window.loadBlogs = async (filterCategory = 'All') => {
             const grid = document.getElementById('blog-grid');
             if(!grid) return;
+            // Don't show loading if we already have cards and just switching tabs
+            if(filterCategory === 'All' && grid.children.length > 1) return;
+
             grid.innerHTML = "<p>Loading Vibes...</p>";
-            window.showSection('home');
             
             try {
                 const q = query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(20));
@@ -444,6 +509,9 @@
                     const likes = post.likes || 0;
                     const views = post.views || 0;
                     
+                    // Cache for routing
+                    window.cachedPosts[pid] = post;
+
                     if (filterCategory !== 'All' && post.category !== filterCategory) return;
                     
                     const card = document.createElement('article');
@@ -452,7 +520,8 @@
                     card.setAttribute('data-title', titleSafe);
 
                     const isLikedLocal = localStorage.getItem('liked_' + pid) ? 'liked-active' : '';
-                    const shareText = `Check out this vibe: ${post.title} on Gen-Z Pulse! https://omprajapati1701.github.io`;
+                    const shareLink = `https://omprajapati1701.github.io/#view=${pid}`;
+                    const shareText = `Check out this vibe: ${post.title} ${shareLink}`;
                     const whatsappLink = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
                     let htmlContent = `
@@ -465,7 +534,7 @@
                                 <span class="view-count">👁️ ${views}</span>
                             </div>
                         </div>
-                        <button class="btn" style="width:100%; margin-top:10px;" onclick='window.openPost("${pid}", ${JSON.stringify(post).replace(/'/g, "&#39;")})'>Read Tea ☕</button>
+                        <button class="btn" style="width:100%; margin-top:10px;" onclick='window.openPost("${pid}")'>Read Tea ☕</button>
                         <div class="action-row">
                              <button class="icon-btn like-btn ${isLikedLocal}" id="like-btn-${pid}" onclick="window.toggleLike('${pid}')">
                                 ❤️ <span id="like-count-${pid}">${likes}</span>
@@ -532,14 +601,9 @@
             }
         };
 
-        window.openPost = async (pid, post) => {
-            window.showSection('read');
-            document.getElementById('full-post-content').innerHTML = `<h1>${post.title}</h1><hr><div style="font-size:1.1rem; line-height:1.8;">${post.content.replace(/\n/g, "<br>")}</div>`;
-            window.scrollTo(0,0);
-            try {
-                const postRef = doc(db, "posts", pid);
-                await updateDoc(postRef, { views: increment(1) });
-            } catch(e) { console.log("View update failed", e); }
+        // 🔥 UPDATED: Just change URL, Router handles the rest
+        window.openPost = (pid) => {
+            window.location.hash = "view=" + pid;
         };
 
         onAuthStateChanged(auth, (user) => {
@@ -552,13 +616,11 @@
                 document.getElementById('auth-view').classList.add('hidden'); 
                 if(user.email === ADMIN_EMAIL) {
                     adminBtn.classList.remove('hidden');
-                    window.loadBlogs('All'); 
                 }
             } else {
                 loginBtn.classList.remove('hidden');
                 logoutBtn.classList.add('hidden');
                 adminBtn.classList.add('hidden');
-                window.loadBlogs('All'); 
             }
         });
 
@@ -631,7 +693,7 @@
             if(!code) return alert("Enter OTP");
             window.confirmationResult.confirm(code).then((result) => {
                 alert("Phone Verified! Welcome.");
-                window.showSection('home');
+                window.goHome();
             }).catch((error) => { alert("Invalid OTP. Try again."); });
         };
 
@@ -649,7 +711,7 @@
         };
 
         window.googleLogin = async () => {
-            try { await signInWithPopup(auth, googleProvider); window.showSection('home'); } 
+            try { await signInWithPopup(auth, googleProvider); window.goHome(); } 
             catch (error) { alert("Error: " + error.message); }
         };
 
@@ -660,7 +722,7 @@
             try {
                 if (isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
                 else { await createUserWithEmailAndPassword(auth, email, pass); alert("Account Created!"); }
-                window.showSection('home');
+                window.goHome();
             } catch (error) { alert("Error: " + error.message); }
         };
 
@@ -681,7 +743,9 @@
             const activeEl = document.getElementById(id + '-view');
             if(activeEl) activeEl.classList.remove('hidden');
         };
-        window.goHome = () => window.showSection('home');
+        
+        // 🔥 UPDATED: Go Home just clears hash
+        window.goHome = () => window.location.hash = "";
 
         window.handlePostSubmit = async () => {
             const user = auth.currentUser;
@@ -703,7 +767,6 @@
                     alert("Published Successfully! 🚀");
                 }
                 window.goHome(); 
-                window.loadBlogs('All');
             } catch(e) { alert("Error: " + e.message); }
         };
         
@@ -713,7 +776,14 @@
         else if(h<18) g.innerText="It's Giving Afternoon ☕";
         else g.innerText="Go to Sleep Bestie 💤";
 
-        window.loadBlogs('All');
+        // 🔥 INITIAL LOAD CHECK
+        // If URL has hash, route to blog. If not, load home.
+        if(!window.location.hash) {
+            window.loadBlogs('All');
+        } else {
+            window.handleRouting();
+        }
+
     </script>
 </body>
 </html>
