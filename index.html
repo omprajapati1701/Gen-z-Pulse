@@ -7,8 +7,12 @@
     <title>Gen-Z Pulse | Best Aesthetic, Tech & Valentine Gifts India 2026</title>
     
     <meta name="description" content="Gen-Z Pulse is India's ultimate aesthetic community. Find the best Valentine's Day gifts, viral Amazon gadgets, mental health tips, and side quests. No cap, just vibes.">
-    <meta name="keywords" content="Valentine Gifts India 2026, Best Amazon Finds Under 500, Aesthetic Desk Setup, Gen-Z Blog India, Instax Camera Price, Tech Gadgets for Students">
+    <meta name="keywords" content="Valentine Gifts India 2026, Best Amazon Finds Under 500, Aesthetic Desk Setup, Gen-Z Blog India, Instax Camera Price, Tech Gadgets for Students, Hustle Culture vs Soft Life, Mental Health for Gen-Z">
     <meta name="author" content="Om Prajapati">
+
+    <meta property="og:title" content="Gen-Z Pulse | No Cap. Just Vibes.">
+    <meta property="og:description" content="Latest trends, tech reviews, and aesthetic vibes for Gen-Z India.">
+    <meta property="og:type" content="website">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXMG099G9S"></script>
     <script>
@@ -87,8 +91,12 @@
         .logo { font-size: 1.5rem; font-weight: 900; color: var(--text-color); cursor: pointer; z-index: 1002; }
         
         /* HAMBURGER MENU */
-        .hamburger { display: none; font-size: 1.8rem; cursor: pointer; color: var(--accent-green); z-index: 1002; }
-        .nav-links { display: flex; gap: 20px; align-items: center; } 
+        .hamburger { display: block; font-size: 1.8rem; cursor: pointer; color: var(--accent-green); z-index: 1002; }
+        .nav-links { 
+            display: none; 
+            gap: 20px; 
+            align-items: center; 
+        } 
         .nav-links span { font-family: var(--font-mono); font-size: 0.9rem; cursor: pointer; transition: 0.3s; padding: 5px 10px; }
         .nav-links span:hover { color: var(--accent-purple); }
         .active-filter { color: var(--accent-green) !important; text-decoration: underline; }
@@ -199,6 +207,13 @@
             /* Marquee Fix */
             .marquee { width: 100%; margin-left: 0; transform: none; margin: 30px 0; }
         }
+
+        /* Laptop View fix for nav-links display */
+        @media (min-width: 769px) {
+            .hamburger { display: none; }
+            .nav-links { display: flex; }
+            .close-menu { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -211,7 +226,7 @@
                 <div class="hamburger" onclick="window.toggleMenu()">☰</div>
 
                 <div class="nav-links" id="main-nav">
-                    <span style="position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #fff; cursor: pointer; display: block;" onclick="window.toggleMenu()" class="close-menu">&times;</span>
+                    <span style="position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #fff; cursor: pointer;" onclick="window.toggleMenu()" class="close-menu">&times;</span>
                     <span onclick="window.loadBlogs('All'); window.toggleMenu()" class="active-filter" id="nav-all">Home</span>
                     <span onclick="window.loadBlogs('Aesthetic'); window.toggleMenu()" id="nav-aesthetic">Aesthetic</span>
                     <span onclick="window.loadBlogs('Side Quests'); window.toggleMenu()" id="nav-side">Side Quests</span>
